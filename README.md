@@ -15,32 +15,68 @@ The analysis identifies top waste-generating zones, tracks monthly waste trends,
 ---
 
 ## Success Criteria
-1. Identify top waste-generating zones per month using RANK()  
-2. Calculate running waste totals per district using SUM() OVER()  
-3. Analyze month-over-month waste change using LAG()  
-4. Segment districts into quartiles using NTILE(4)  
-5. Compute three-month moving averages using AVG() OVER()
+1.  top waste-generating zones per month using RANK()  
+2. running waste totals per district using SUM() OVER()  
+3. month-over-month waste change using LAG()  
+4.  districts into quartiles using NTILE(4)  
+5.  three-month moving averages using AVG() OVER()
 
 ---
 
 ## Database Schema
-Three tables were designed:
-
-- districts  
-- zones  
-- collections  
 
 A one-to-many relationship exists between districts and zones, and between zones and collections.
 
-ER diagram is provided in the screenshots folder.
+```sql
+-- Create districts table
+CREATE TABLE districts (
+    district_id SERIAL PRIMARY KEY,
+    district_name VARCHAR(100) NOT NULL,
+    population INT NOT NULL
+);
+
+-- Create zones table
+CREATE TABLE zones (
+    zone_id SERIAL PRIMARY KEY,
+    district_id INT REFERENCES districts(district_id),
+    zone_name VARCHAR(100) NOT NULL
+);
+
+-- Create collections table
+CREATE TABLE collections (
+    collection_id SERIAL PRIMARY KEY,
+    zone_id INT REFERENCES zones(zone_id),
+    collection_date DATE NOT NULL,
+    waste_kg DECIMAL(10,2) NOT NULL,
+    contractor VARCHAR(100)
+);
+
+```
+
+![ERD](screenshots/ER%20DIAGRAM.png)
 
 ---
 
 ## Part A — SQL JOINs
 
 ### INNER JOIN
-Retrieves valid rubbish collection records with district and zone details.
+```sql
+SELECT d.district_name, z.zone_name, c.collection_date, c.waste_kg
+FROM collections c
+INNER JOIN zones z ON c.zone_id = z.zone_id
+INNER JOIN districts d ON z.district_id = d.district_id;
 
+```
+
+
+![ER] (screenshots/inner_join.png)
+
+---
+
+Retrieves valid rubbish collection records with district and zone details.
+```
+
+```
 ### LEFT JOIN
 Identifies districts without any collection records.
 
@@ -61,6 +97,8 @@ All JOIN queries are provided in `sql/joins.sql`.
 
 ### Ranking Functions
 RANK() used to identify top waste-generating zones per month.
+
+
 
 ### Aggregate Window Functions
 SUM() OVER used to compute running waste totals per district.
