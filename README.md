@@ -1,4 +1,4 @@
-# plsql_window_function_28439_Feeza_Winnie
+# plsql_window_function_28439_Winnie
 
 # Municipal Rubbish Collection Analysis  
 SQL JOINs and Window Functions Project
